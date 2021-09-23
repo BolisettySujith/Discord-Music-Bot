@@ -56,6 +56,15 @@ async def on_message(message):
         await message.channel.send("ohh...")
     elif message.content.startswith('download an youtube video'):
         await message.channel.send("Sorry the feature is not implemented")
+    elif ('good morning' in message.content) or ('good evening' in message.content) or ('good night' in message.content) or ('good afternoon' in message.content):
+        if 'morning' in message.content:
+            await message.channel.send("Good Morning")
+        elif 'evening' in message.content:
+            await message.channel.send("Good Evening")
+        elif 'night' in message.content:
+            await message.channel.send("Good Night")
+        elif 'afternoon' in message.content:
+            await message.channel.send("Good Afternoon")
     # elif message.content.startswith('!yt'):
     #     link= message.content.replace("!yt", "")
     #     yt=YouTube(link)
