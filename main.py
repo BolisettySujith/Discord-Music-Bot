@@ -50,6 +50,12 @@ async def on_message(message):
         await message.channel.send("Hai, how are u")
     elif 'joke' in message.content:
         await message.channel.send(pyjokes.get_joke())
+    elif 'your name' in message.content:
+        await message.channel.send("I am an AI bot")
+    elif 'your age' in message.content:
+        await message.channel.send("I am very young that u")
+    elif 'are you single' in message.content:
+        await message.channel.send("N, I am in a relationship with wifi")
     elif 'current time' in message.content:
         await message.channel.send(datetime.datetime.now().strftime('%I:%M %p'))
     elif message.content.startswith('i am fine'):
