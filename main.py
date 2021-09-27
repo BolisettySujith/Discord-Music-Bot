@@ -52,6 +52,8 @@ async def on_message(message):
         await message.channel.send(pyjokes.get_joke())
     elif 'your name' in message.content:
         await message.channel.send("I am an AI bot")
+    elif 'are you free' in message.content:
+        await message.channel.send("I'm always free to help/talk to you")
     elif 'your age' in message.content:
         await message.channel.send("I am very young that u")
     elif 'are you single' in message.content:
