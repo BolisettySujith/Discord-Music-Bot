@@ -1,100 +1,84 @@
 #Sujith
-import os
-import pyjokes
-import discord
-import datetime
+
 from pytube import YouTube
+from discord.ext import commands
+from discord.utils import get
+from discord import FFmpegPCMAudio
+from discord import TextChannel
+from youtube_dl import YoutubeDL
 
-TOKEN = "<TOKEN>"
+TOKEN = "<YOUR TOKEN>"
 
-client = discord.Client()
+client1 = commands.Bot(command_prefix='.')  # prefix our commands with '.'
+players = {}
 
-@client.event
-async def on_ready():
-    print(f'{client.user} has connected to Discord!')
+# command for bot to join the channel of the user, if the bot has already joined and is in a different channel, it will move to the channel the user is in
+@client1.command()
+async def join(ctx):
+    channel = ctx.message.author.voice.channel
+    voice = get(client1.voice_clients, guild=ctx.guild)
+    if voice and voice.is_connected():
+        await voice.move_to(channel)
+    else:
+        voice = await channel.connect()
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
+
+# command to play sound from a youtube URL
+@client1.command()
+async def play(ctx, url):
+    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+    FFMPEG_OPTIONS = {
+        'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+    voice = get(client1.voice_clients, guild=ctx.guild)
+
+    if not voice.is_playing():
+        with YoutubeDL(YDL_OPTIONS) as ydl:
+            info = ydl.extract_info(url, download=False)
+        URL = info['url']
+        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+        voice.is_playing()
+        await ctx.send('Bot is playing')
+
+# check if the bot is already playing
+    else:
+        await ctx.send("Bot is already playing")
         return
-    if message.content.startswith('#CPL'):
-        await message.channel.send("""Semester 3 Course Page
-        https://amritauniv.sharepoint.com/sites/AIE2020/SitePages/Semester-3.aspx
-        Operating Systems
-        https://amritauniv.sharepoint.com/sites/19AIE202OperatingSystems40/SitePages/19AIE202-Operating-Systems.aspx?web=1&OR=Teams-HL&CT=1630477344936
-        Data Structures and Algorithms 2
-        https://amritauniv.sharepoint.com/sites/19AIE203DataStructuresAlgorithms-2?OR=Teams-HL&CT=1630650595179
-        Introduction to Robotics
-        https://amritauniv.sharepoint.com/sites/19AIE201_Intro_to_Robotics/SitePages/ProjectHome.aspx
-        Intelligence of Biological Systems 3
-        https://amritauniv.sharepoint.com/sites/IntelligenceofBiologicalSystems3?OR=Teams-HL&CT=1630639882730
-        Mathematics for intelligent Systems 3 
-        https://amritauniv.sharepoint.com/sites/MIS32020batch
-        Python for Machine Learning
-        https://amritauniv.sharepoint.com/sites/19AIE205PythonforMachineLearningS3-2020Admissions/SitePages/19AIE205-Python-for-Machine-Learning.aspx?originalPath=aHR0cHM6Ly9hbXJpdGF1bml2LnNoYXJlcG9pbnQuY29tLzp1Oi9zLzE5QUlFMjA1UHl0aG9uZm9yTWFjaGluZUxlYXJuaW5nUzMtMjAyMEFkbWlzc2lvbnMvRVdOZmpaVWRJWHBOaDhDc2FnZFRzOUlCSlU4LVoxZC1jUmo2Q1pXTGxrTXVwZz9ydGltZT1aWE4zRGhGdDJVZw""")
-    elif message.content.startswith('#help'):
-        await message.channel.send("""
-        Share point course Page links
-        #CPL - For all cource pages links
-        #sp-os - Operating Systems
-        #sp-dsa - Data Structures and Algorithms
-        #sp-robotics - Introduction to Robotics
-        #sp-bio - Intelligence of Biological Systems
-        #sp-mat - Mathematics for intelligent Systems
-        #sp-ml - Python for Machine Learning
 
-        Interation commands:
-        hello, i am fine, what about you, what is your name, you are lucky
-        """)
-    elif message.content.startswith('hello'):
-        await message.channel.send("Hai, how are u")
-    elif 'joke' in message.content:
-        await message.channel.send(pyjokes.get_joke())
-    elif 'your name' in message.content:
-        await message.channel.send("I am an AI bot")
-    elif 'are you free' in message.content:
-        await message.channel.send("I'm always free to help/talk to you")
-    elif 'your age' in message.content:
-        await message.channel.send("I am very young that u")
-    elif 'are you single' in message.content:
-        await message.channel.send("N, I am in a relationship with wifi")
-    elif 'current time' in message.content:
-        await message.channel.send(datetime.datetime.now().strftime('%I:%M %p'))
-    elif message.content.startswith('i am fine'):
-        await message.channel.send("ohh...")
-    elif message.content.startswith('download an youtube video'):
-        await message.channel.send("Sorry the feature is not implemented")
-    elif ('good morning' in message.content) or ('good evening' in message.content) or ('good night' in message.content) or ('good afternoon' in message.content):
-        if 'morning' in message.content:
-            await message.channel.send("Good Morning")
-        elif 'evening' in message.content:
-            await message.channel.send("Good Evening")
-        elif 'night' in message.content:
-            await message.channel.send("Good Night")
-        elif 'afternoon' in message.content:
-            await message.channel.send("Good Afternoon")
-    # elif message.content.startswith('!yt'):
-    #     link= message.content.replace("!yt", "")
-    #     yt=YouTube(link)
-    #     yt.streams.get_highest_resolution().download()
-    #     await message.channel.send("Downloaded the video")
-    elif message.content.startswith('what about you'):
-        await message.channel.send("i am superb, having no assignments and tests")
-    elif message.content.startswith('you are lucky'):
-        await message.channel.send("yeah")
-    elif message.content.startswith('what is your name'):
-        await message.channel.send("i am a AI BOT")
-    elif message.content.startswith('#sp-mat'):
-        await message.channel.send("https://amritauniv.sharepoint.com/sites/MIS32020batch")
-    elif message.content.startswith('#sp-ml'):
-        await message.channel.send("https://amritauniv.sharepoint.com/sites/19AIE205PythonforMachineLearningS3-2020Admissions/SitePages/19AIE205-Python-for-Machine-Learning.aspx?originalPath=aHR0cHM6Ly9hbXJpdGF1bml2LnNoYXJlcG9pbnQuY29tLzp1Oi9zLzE5QUlFMjA1UHl0aG9uZm9yTWFjaGluZUxlYXJuaW5nUzMtMjAyMEFkbWlzc2lvbnMvRVdOZmpaVWRJWHBOaDhDc2FnZFRzOUlCSlU4LVoxZC1jUmo2Q1pXTGxrTXVwZz9ydGltZT1aWE4zRGhGdDJVZw")
-    elif message.content.startswith('#sp-robotics'):
-        await message.channel.send("https://amritauniv.sharepoint.com/sites/19AIE201_Intro_to_Robotics/SitePages/ProjectHome.aspx")
-    elif message.content.startswith('#sp-bio'):
-        await message.channel.send("https://amritauniv.sharepoint.com/sites/IntelligenceofBiologicalSystems3?OR=Teams-HL&CT=1630639882730")
-    elif message.content.startswith('#sp-dsa'):
-        await message.channel.send("https://amritauniv.sharepoint.com/sites/19AIE203DataStructuresAlgorithms-2?OR=Teams-HL&CT=1630650595179")
-    elif message.content.startswith('#sp-os'):
-        await message.channel.send("https://amritauniv.sharepoint.com/sites/19AIE202OperatingSystems40/SitePages/19AIE202-Operating-Systems.aspx?web=1&OR=Teams-HL&CT=1630477344936")
 
-client.run(TOKEN)
+# command to resume voice if it is paused
+@client1.command()
+async def resume(ctx):
+    voice = get(client1.voice_clients, guild=ctx.guild)
+
+    if not voice.is_playing():
+        voice.resume()
+        await ctx.send('Bot is resuming')
+
+
+# command to pause voice if it is playing
+@client1.command()
+async def pause(ctx):
+    voice = get(client1.voice_clients, guild=ctx.guild)
+
+    if voice.is_playing():
+        voice.pause()
+        await ctx.send('Bot has been paused')
+
+
+# command to stop voice
+@client1.command()
+async def stop(ctx):
+    voice = get(client1.voice_clients, guild=ctx.guild)
+
+    if voice.is_playing():
+        voice.stop()
+        await ctx.send('Stopping...')
+
+
+# command to clear channel messages
+@client1.command()
+async def clear(ctx, amount=5):
+    await ctx.channel.purge(limit=amount)
+    await ctx.send("Messages have been cleared")
+
+client1.run(TOKEN)
