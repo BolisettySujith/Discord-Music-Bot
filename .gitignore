@@ -1,0 +1,4 @@
+# Miscellaneous
+.env
+# Distribution / packaging
+myvenv/
