@@ -4,7 +4,7 @@ from discord.ext import commands
 
 load_dotenv()
 
-client1 = commands.Bot(command_prefix='!')  # prefix our commands with '.'
+client1 = commands.Bot(command_prefix='!')  # prefix our commands with '!'
 players = {}
 
 @client1.event
@@ -16,6 +16,11 @@ async def on_ready():
 async def clear(ctx, amount=5):
     await ctx.channel.purge(limit=amount)
     await ctx.send("Messages have been cleared")
+
+@client1.command()
+async def leave(ctx):
+    voice = ctx.message.guild.voice_client
+    await voice.disconnect()
 
 # command to clear channel messages
 @client1.command()
