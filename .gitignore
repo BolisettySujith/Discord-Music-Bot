@@ -2,3 +2,5 @@
 .env
 # Distribution / packaging
 myvenv/
+venv/
+__pycache__/
