@@ -71,10 +71,6 @@ class Audio(commands.Cog):
             voice.stop()
             await ctx.send('Music has been Stoped...')
     
-    @commands.command()
-    async def leave(self,ctx):
-        voice = ctx.message.guild.voice_client
-        await voice.disconnect()
 
 
 def setup(client):
